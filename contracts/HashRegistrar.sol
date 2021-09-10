@@ -1,4 +1,6 @@
-pragma solidity ^0.4.24;
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
 
 
 /*
@@ -16,7 +18,7 @@ The plan is to test the basic features and then move to a new contract in at mos
 
 import "./ENS.sol";
 import "./DeedImplementation.sol";
-import "./Registrar.sol";
+import "./FIFSRegistrar.sol";
 
 /**
  * @title Registrar

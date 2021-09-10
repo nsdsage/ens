@@ -1,4 +1,6 @@
-pragma solidity ^0.7.0;
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
 
 import "./ENS.sol";
 
@@ -31,7 +33,7 @@ contract TestRegistrar {
     function register(bytes32 label, address owner) public {
         require(expiryTimes[label] < block.timestamp);
 
-        expiryTimes[label] = now + REGISTRATION_PERIOD;
+        expiryTimes[label] = block.timestamp + REGISTRATION_PERIOD;
         ens.setSubnodeOwner(rootNode, label, owner);
     }
 }
