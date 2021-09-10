@@ -4,8 +4,7 @@ const sha3 = require('web3-utils').sha3;
 const { exceptions } = require("@ensdomains/test-utils")
 
 let contracts = [
-    [artifacts.require('ENSRegistry.sol'), 'Solidity'],
-    [artifacts.require('ENS.lll'), 'LLL'],
+    [artifacts.require('ENSRegistry.sol'), 'Solidity']
 ];
 
 contracts.forEach(function ([ENS, lang]) {
@@ -31,13 +30,9 @@ contracts.forEach(function ([ENS, lang]) {
         });
 
         it('should prohibit transfers by non-owners', async () => {
-            try {
-                await ens.setOwner('0x1', '0x0000000000000000000000000000000000001234', {from: accounts[0]});
-            } catch (error) {
-                return exceptions.ensureException(error);
-            }
-
-            assert.fail('transfer did not fail');
+            await exceptions.expectFailure(
+                ens.setOwner('0x1', '0x0000000000000000000000000000000000001234', {from: accounts[0]})
+            );
         });
 
         it('should allow setting resolvers', async () => {
@@ -54,13 +49,9 @@ contracts.forEach(function ([ENS, lang]) {
         });
 
         it('should prevent setting resolvers by non-owners', async () => {
-            try {
-                await ens.setResolver('0x1', '0x0000000000000000000000000000000000001234', {from: accounts[0]});
-            } catch (error) {
-                return exceptions.ensureException(error);
-            }
-
-            assert.fail('setting resolver did not fail');
+            await exceptions.expectFailure(
+                ens.setResolver('0x1', '0x0000000000000000000000000000000000001234', {from: accounts[0]})
+            );
         });
 
         it('should allow setting the TTL', async () => {
@@ -75,13 +66,7 @@ contracts.forEach(function ([ENS, lang]) {
         });
 
         it('should prevent setting the TTL by non-owners', async () => {
-            try {
-                await ens.setTTL('0x1', 3600, {from: accounts[0]});
-            } catch (error) {
-                return exceptions.ensureException(error);
-            }
-
-            assert.fail('setting resolver did not fail');
+            await exceptions.expectFailure(ens.setTTL('0x1', 3600, {from: accounts[0]}));
         });
 
         it('should allow the creation of subnodes', async () => {
@@ -97,13 +82,7 @@ contracts.forEach(function ([ENS, lang]) {
         });
 
         it('should prohibit subnode creation by non-owners', async () => {
-            try {
-                await ens.setSubnodeOwner('0x0', sha3('eth'), accounts[1], {from: accounts[1]});
-            } catch (error) {
-                return exceptions.ensureException(error);
-            }
-
-            assert.fail('setting resolver did not fail');
+            await exceptions.expectFailure(ens.setSubnodeOwner('0x0', sha3('eth'), accounts[1], {from: accounts[1]}));
         });
     });
 });
