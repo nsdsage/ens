@@ -1,9 +1,9 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.7.0;
 
 import "./ENS.sol";
 
-contract Resolver {
-    function setName(bytes32 node, string memory name) public;
+abstract contract NameResolver {
+    function setName(bytes32 node, string memory name) public virtual;
 }
 
 contract ReverseRegistrar {
@@ -11,14 +11,14 @@ contract ReverseRegistrar {
     bytes32 public constant ADDR_REVERSE_NODE = 0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2;
 
     ENS public ens;
-    Resolver public defaultResolver;
+    NameResolver public defaultResolver;
 
     /**
      * @dev Constructor
      * @param ensAddr The address of the ENS registry.
      * @param resolverAddr The address of the default reverse resolver.
      */
-    constructor(ENS ensAddr, Resolver resolverAddr) public {
+    constructor(ENS ensAddr, NameResolver resolverAddr) public {
         ens = ensAddr;
         defaultResolver = resolverAddr;
 
@@ -28,7 +28,7 @@ contract ReverseRegistrar {
             oldRegistrar.claim(msg.sender);
         }
     }
-    
+
     /**
      * @dev Transfers ownership of the reverse ENS record associated with the
      *      calling account.
@@ -95,7 +95,7 @@ contract ReverseRegistrar {
      * @dev An optimised function to compute the sha3 of the lower-case
      *      hexadecimal representation of an Ethereum address.
      * @param addr The address to hash
-     * @return The SHA3 hash of the lower-case hexadecimal encoding of the
+     * @return ret The SHA3 hash of the lower-case hexadecimal encoding of the
      *         input address.
      */
     function sha3HexAddress(address addr) private pure returns (bytes32 ret) {

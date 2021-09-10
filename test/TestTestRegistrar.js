@@ -1,7 +1,7 @@
 const TestRegistrar = artifacts.require('TestRegistrar.sol');
 const ENS = artifacts.require('ENSRegistry.sol');
 
-const utils = require('./helpers/Utils.js');
+const { exceptions, evm } = require('@ensdomains/test-utils');
 const namehash = require('eth-ens-namehash');
 const sha3 = require('web3-utils').sha3;
 
@@ -11,7 +11,7 @@ contract('TestRegistrar', function (accounts) {
     let registrar, ens;
 
     beforeEach(async () => {
-        node = namehash('eth');
+        node = namehash.hash('eth');
 
         ens = await ENS.new();
         registrar = await TestRegistrar.new(ens.address, '0x0');
@@ -26,24 +26,15 @@ contract('TestRegistrar', function (accounts) {
     });
 
     it('forbids transferring names within the test period', async () => {
-
         await registrar.register(sha3('eth'), accounts[1], {from: accounts[0]});
-
-        try {
-            await registrar.register(sha3('eth'), accounts[0], {from: accounts[0]});
-        } catch (error) {
-            return utils.ensureException(error);
-        }
-
-        assert.fail('transferring name did not fail');
-
+        await exceptions.expectFailure(registrar.register(sha3('eth'), accounts[0], {from: accounts[0]}));
     });
 
     it('allows claiming a name after the test period expires', async () => {
         await registrar.register(sha3('eth'), accounts[1], {from: accounts[0]});
         assert.equal(await ens.owner(node), accounts[1]);
 
-        await utils.advanceTime(28 * 24 * 60 * 60 + 1);
+        await evm.advanceTime(28 * 24 * 60 * 60 + 1);
 
         await registrar.register(sha3('eth'), accounts[0], {from: accounts[0]});
         assert.equal(await ens.owner(node), accounts[0]);
